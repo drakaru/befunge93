@@ -118,9 +118,8 @@ struct BefungeProgram {
     }
 
     void stackDuplicateTop() {
-        long val = 0;
-        if (stack.size()>0)
-            val = stack.top();
+        long val = stackValue();
+        stack.push(val);
         stack.push(val);
     }
 
