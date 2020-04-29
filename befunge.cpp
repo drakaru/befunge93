@@ -103,11 +103,12 @@ struct BefungeProgram {
         }
     }
 
-    char get_cursor() const {
+    char getCursor() const {
         return grid[programCounter.y][programCounter.x];
     }
 
-    long stack_value() {
+    long stackValue() {
+        // pop and return the top of the stack, if the stack is empty, return 0.
         long val = 0;
         if (stack.size()>0) {
             val = stack.top();
@@ -116,7 +117,7 @@ struct BefungeProgram {
         return val;
     }
 
-    void stack_duplicate_top() {
+    void stackDuplicateTop() {
         long val = 0;
         if (stack.size()>0)
             val = stack.top();
@@ -124,7 +125,7 @@ struct BefungeProgram {
     }
 
     bool tick() {
-        char cursor = get_cursor();
+        char cursor = getCursor();
         
         if (cursor=='"') {
             stringMode = !stringMode;
@@ -136,46 +137,46 @@ struct BefungeProgram {
             {
             case '+':
                 {
-                    long a = stack_value();
-                    long b = stack_value();
+                    long a = stackValue();
+                    long b = stackValue();
                     stack.push(a+b);
                 }
                 break;
             case '-':
                 {
-                    long a = stack_value();
-                    long b = stack_value();
+                    long a = stackValue();
+                    long b = stackValue();
                     stack.push(b-a);
                 }
                 break;
             case '*':
                 {
-                    long a = stack_value();
-                    long b = stack_value();
+                    long a = stackValue();
+                    long b = stackValue();
                     stack.push(a*b);
                 }
                 break;
             case '/':
                 {
-                    long a = stack_value();
-                    long b = stack_value();
+                    long a = stackValue();
+                    long b = stackValue();
                     stack.push(b/a);
                 }
                 break;
             case '%':
                 {
-                    long a = stack_value();
-                    long b = stack_value();
+                    long a = stackValue();
+                    long b = stackValue();
                     stack.push(b%a);
                 }
                 break;
             case '!':
-                stack.push(stack_value() == 0 ? 1 : 0);
+                stack.push(stackValue() == 0 ? 1 : 0);
                 break;
             case '`':
                 {
-                    long a = stack_value();
-                    long b = stack_value();
+                    long a = stackValue();
+                    long b = stackValue();
                     stack.push(a>b ? 1: 0);
                 }
                 break;
@@ -206,7 +207,7 @@ struct BefungeProgram {
                 }
                 break;
             case '_':
-                if(stack_value()==0) {
+                if(stackValue()==0) {
                     programCounter.set_direction_right();
                 } else
                 {
@@ -214,7 +215,7 @@ struct BefungeProgram {
                 }
                 break;
             case '|':
-                if(stack_value()==0) {
+                if(stackValue()==0) {
                     programCounter.set_direction_down();
                 } else
                 {
@@ -222,41 +223,41 @@ struct BefungeProgram {
                 }
                 break;
             case ':':
-                stack_duplicate_top();
+                stackDuplicateTop();
                 break;
             case '\\':
                 {
-                    long a = stack_value();
-                    long b = stack_value();
+                    long a = stackValue();
+                    long b = stackValue();
                     stack.push(a);
                     stack.push(b);
                 }
                 break;
             case '$':
-                stack_value();
+                stackValue();
                 break;
             case '.':
-                printf("%ld", stack_value());
+                printf("%ld", stackValue());
                 break;
             case ',':
-                printf("%c", (char)stack_value());
+                printf("%c", (char)stackValue());
                 break;
             case '#':
                 programCounter.move();
                 break;
             case 'g':
                 {
-                    long x = stack_value();
-                    long y = stack_value();
+                    long x = stackValue();
+                    long y = stackValue();
                     long v = grid[y][x];
                     stack.push(v);
                 }
                 break;
             case 'p':
                 {
-                    long v = stack_value();
-                    long x = stack_value();
-                    long y = stack_value();
+                    long v = stackValue();
+                    long x = stackValue();
+                    long y = stackValue();
                     grid[y][x] = v;
                 }
                 break;
@@ -291,30 +292,6 @@ struct BefungeProgram {
         return true;
     }
 };
-
-
-/*const char* test_program = "64+\"!dlroW ,olleH\">:#,_@";
-
-BefungeProgram loadTestProgram() {
-    BefungeProgram befungeProgram = BefungeProgram();
-    int x=0,y=0;
-
-    for(const char* it = test_program; *it; ++it) {
-        if (*it == '\n') {
-            x = 0;
-            y++;
-            if (y>=MAX_Y) {
-                break;
-            }
-            continue;
-        }
-        if (x<MAX_X) {
-            befungeProgram.grid[y][x] = *it;
-        }
-        x++;
-    }
-    return befungeProgram;
-}*/
 
 bool loadProgram(FILE& filePtr, BefungeProgram& program) {
     int x = 0;
