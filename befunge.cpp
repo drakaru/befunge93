@@ -103,7 +103,7 @@ struct BefungeProgram {
         }
     }
 
-    long get_cursor() const {
+    char get_cursor() const {
         return grid[programCounter.y][programCounter.x];
     }
 
