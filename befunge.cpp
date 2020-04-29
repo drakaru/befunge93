@@ -117,12 +117,6 @@ struct BefungeProgram {
         return val;
     }
 
-    void stackDuplicateTop() {
-        long val = stackValue();
-        stack.push(val);
-        stack.push(val);
-    }
-
     bool tick() {
         char cursor = getCursor();
         
@@ -222,7 +216,11 @@ struct BefungeProgram {
                 }
                 break;
             case ':':
-                stackDuplicateTop();
+                {
+                    long val = stackValue();
+                    stack.push(val);
+                    stack.push(val);
+                }
                 break;
             case '\\':
                 {
@@ -246,17 +244,17 @@ struct BefungeProgram {
                 break;
             case 'g':
                 {
-                    long x = stackValue();
                     long y = stackValue();
+                    long x = stackValue();
                     long v = grid[y][x];
                     stack.push(v);
                 }
                 break;
             case 'p':
                 {
-                    long v = stackValue();
-                    long x = stackValue();
                     long y = stackValue();
+                    long x = stackValue();
+                    long v = stackValue();
                     grid[y][x] = v;
                 }
                 break;
@@ -354,6 +352,11 @@ int main(int argc, char* argv[]) {
     }
 
     //printf("steps: %d\n", steps);
+    /*printf("\n");
+    while (program.stack.size() > 0) {
+        printf("%ld\n", program.stack.top());
+        program.stack.pop();
+    }*/
     printf("\n");
     return 0;
 }
