@@ -3,8 +3,8 @@
 #include <ctime>
 #include <stack>
 
-#define MAX_X 80
-#define MAX_Y 25
+const int MAX_X = 80;
+const int MAX_Y = 25;
 
 /* 
     a little befunge93 interpreter for fun
@@ -43,14 +43,15 @@
     @ (end)                                 ends program
 */
 
-struct ProgramCounter {
+struct ProgramCounter 
+{
     short x = 0;
     short y = 0;
     short dx = 1;
     short dy = 0;
     
-
-    void move() {
+    void move() 
+    {
         x += dx;
         y += dy;
 
@@ -66,111 +67,120 @@ struct ProgramCounter {
         }
     }
 
-    void set_direction_left() {
+    void set_direction_left() 
+    {
         dx = -1;
         dy = 0;
     }
 
-    void set_direction_right() {
+    void set_direction_right() 
+    {
         dx = 1;
         dy = 0;
     }
 
-    void set_direction_up() {
+    void set_direction_up() 
+    {
         dx = 0;
         dy = -1;
     }
 
-    void set_direction_down() {
+    void set_direction_down() 
+    {
         dx = 0;
         dy = 1;
     }
 };
 
-struct BefungeProgram {
+struct BefungeProgram 
+{
     ProgramCounter programCounter;
     std::stack<long> stack;
     char grid[MAX_Y][MAX_X];
     bool stringMode = false;
 
-    BefungeProgram() {
+    BefungeProgram() 
+    {
         programCounter = ProgramCounter();
         stack = std::stack<long>();
-        for (size_t y=0; y<MAX_Y; y++) {
-            for (size_t x=0; x<MAX_X; x++) {
+        for (size_t y = 0; y < MAX_Y; y++) {
+            for (size_t x = 0; x < MAX_X; x++) {
                 grid[y][x] = 0;
             }
         }
     }
 
-    char getCursor() const {
+    char getCursor() const 
+    {
+        // char at the current PC
         return grid[programCounter.y][programCounter.x];
     }
 
-    long stackValue() {
-        // pop and return the top of the stack, if the stack is empty, return 0.
+    long popStack() 
+    {
+        // if the stack is empty, return 0.
         long val = 0;
-        if (stack.size()>0) {
+        if (stack.size() > 0) {
             val = stack.top();
             stack.pop();
         }
         return val;
     }
 
-    bool tick() {
+    bool tick() 
+    {
         char cursor = getCursor();
         
-        if (cursor=='"') {
+        if (cursor == '"') {
             stringMode = !stringMode;
         } else if (stringMode) {
             stack.push(cursor);
         } else {
 
-            switch (cursor)
-            {
+            switch (cursor) {
             case '+':
                 {
-                    long a = stackValue();
-                    long b = stackValue();
-                    stack.push(a+b);
+                    long a = popStack();
+                    long b = popStack();
+                    stack.push(a + b);
                 }
                 break;
             case '-':
                 {
-                    long a = stackValue();
-                    long b = stackValue();
-                    stack.push(b-a);
+                    long a = popStack();
+                    long b = popStack();
+                    stack.push(b - a);
                 }
                 break;
             case '*':
                 {
-                    long a = stackValue();
-                    long b = stackValue();
-                    stack.push(a*b);
+                    long a = popStack();
+                    long b = popStack();
+                    stack.push(a * b);
                 }
                 break;
             case '/':
                 {
-                    long a = stackValue();
-                    long b = stackValue();
-                    stack.push(b/a);
+                    long a = popStack();
+                    long b = popStack();
+                    stack.push(b / a);
                 }
                 break;
             case '%':
                 {
-                    long a = stackValue();
-                    long b = stackValue();
-                    stack.push(b%a);
+                    long a = popStack();
+                    long b = popStack();
+                    stack.push(b % a);
                 }
                 break;
             case '!':
-                stack.push(stackValue() == 0 ? 1 : 0);
+                stack.push(popStack() == 0 ? 1 : 0);
                 break;
             case '`':
                 {
-                    long a = stackValue();
-                    long b = stackValue();
-                    stack.push(a>b ? 1: 0);
+                    long a = popStack();
+                    long b = popStack();
+                    stack.push(a > b ? 1: 0);
                 }
                 break;
             case '>':
@@ -188,11 +198,11 @@ struct BefungeProgram {
             case '?':
                 {
                     int r = rand() % 4;
-                    if (r==0) {
+                    if (r == 0) {
                         programCounter.set_direction_down();
-                    } else if (r==1) {
+                    } else if (r == 1) {
                         programCounter.set_direction_up();
-                    } else if (r==2) {
+                    } else if (r == 2) {
                         programCounter.set_direction_left();
                     } else {
                         programCounter.set_direction_right();
@@ -200,61 +210,59 @@ struct BefungeProgram {
                 }
                 break;
             case '_':
-                if(stackValue()==0) {
+                if(popStack()==0) {
                     programCounter.set_direction_right();
-                } else
-                {
+                } else {
                     programCounter.set_direction_left();
                 }
                 break;
             case '|':
-                if(stackValue()==0) {
+                if(popStack()==0) {
                     programCounter.set_direction_down();
-                } else
-                {
+                } else {
                     programCounter.set_direction_up();
                 }
                 break;
             case ':':
                 {
-                    long val = stackValue();
+                    long val = popStack();
                     stack.push(val);
                     stack.push(val);
                 }
                 break;
             case '\\':
                 {
-                    long a = stackValue();
-                    long b = stackValue();
+                    long a = popStack();
+                    long b = popStack();
                     stack.push(a);
                     stack.push(b);
                 }
                 break;
             case '$':
-                stackValue();
+                popStack();
                 break;
             case '.':
-                printf("%ld", stackValue());
+                printf("%ld", popStack());
                 break;
             case ',':
-                printf("%c", (char)stackValue());
+                printf("%c", (char)popStack());
                 break;
             case '#':
                 programCounter.move();
                 break;
             case 'g':
                 {
-                    long y = stackValue();
-                    long x = stackValue();
+                    long y = popStack();
+                    long x = popStack();
                     long v = grid[y][x];
                     stack.push(v);
                 }
                 break;
             case 'p':
                 {
-                    long y = stackValue();
-                    long x = stackValue();
-                    long v = stackValue();
+                    long y = popStack();
+                    long x = popStack();
+                    long v = popStack();
                     grid[y][x] = v;
                 }
                 break;
@@ -278,7 +286,7 @@ struct BefungeProgram {
                 break;
             
             default:
-                if (cursor>='0'&&cursor<='9'){
+                if (cursor >= '0' && cursor <= '9') {
                     stack.push(cursor-48);
                 }
                 break;
@@ -290,7 +298,8 @@ struct BefungeProgram {
     }
 };
 
-bool loadProgram(FILE& filePtr, BefungeProgram& program) {
+bool loadProgram(FILE& filePtr, BefungeProgram& program) 
+{
     int x = 0;
     int y = 0;
     char buf[1024];
@@ -304,16 +313,16 @@ bool loadProgram(FILE& filePtr, BefungeProgram& program) {
             break;
         }
         const char* it = buf;
-        for (size_t i = 0;i<bytesRead;++i,++it) {
+        for (size_t i = 0; i < bytesRead; ++i, ++it) {
             if (*it == '\n') {
                 x = 0;
                 y++;
-                if (y>=MAX_Y) {
+                if (y >= MAX_Y) {
                     break;
                 }
                 continue;
             }
-            if (x<MAX_X) {
+            if (x < MAX_X) {
                 program.grid[y][x] = *it;
             }
             x++;
@@ -323,7 +332,8 @@ bool loadProgram(FILE& filePtr, BefungeProgram& program) {
     return true;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
     if (argc != 2) {
         printf("Incorrect number of arguments. Usage: befunge [sourcePath]\n");
         return 1;
@@ -331,16 +341,17 @@ int main(int argc, char* argv[]) {
 
     srand(time(NULL));
 
-    BefungeProgram program = BefungeProgram();
+    BefungeProgram program;
 
-    char* sourcePath = argv[1];
+    const char* sourcePath = argv[1];
     FILE* sourceFile = fopen(sourcePath, "r");
-    if (sourceFile == NULL) {
+    if (sourceFile == NULL){
         printf("Unable to open source file: %s\n", sourcePath);
         return 1;
     };
 
     bool success = loadProgram(*sourceFile, program);
+    fclose(sourceFile);
     if (!success) {
         printf("Error processing source file contents.\n");
         return 1;
@@ -353,7 +364,8 @@ int main(int argc, char* argv[]) {
 
     //printf("steps: %d\n", steps);
     /*printf("\n");
-    while (program.stack.size() > 0) {
+    while (program.stack.size() > 0) 
+    {
         printf("%ld\n", program.stack.top());
         program.stack.pop();
     }*/
