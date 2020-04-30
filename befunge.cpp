@@ -56,13 +56,13 @@ struct ProgramCounter
         y += dy;
 
         // wrap around
-        if (x<0) {
-            x = MAX_X;
-        } else if (x>=MAX_X) {
+        if (x < 0) {
+            x = MAX_X - 1;
+        } else if (x >= MAX_X) {
             x = 0;
-        } else if (y<0) {
-            y = MAX_Y;
-        } else if (y>=MAX_Y) {
+        } else if (y < 0) {
+            y = MAX_Y - 1;
+        } else if (y >= MAX_Y) {
             y = 0;
         }
     }
@@ -180,7 +180,7 @@ struct BefungeProgram
                 {
                     long a = popStack();
                     long b = popStack();
-                    stack.push(a > b ? 1: 0);
+                    stack.push(b > a ? 1: 0);
                 }
                 break;
             case '>':
